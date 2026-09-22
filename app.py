@@ -18,9 +18,29 @@ def is_postgres():
     return bool(os.environ.get("DATABASE_URL"))
 
 
+class ConnectionProxy:
+    def __init__(self, conn):
+        self._conn = conn
+
+    def execute(self, query, params=()):
+        if is_postgres():
+            return self._conn.cursor().execute(query.replace("?", "%s"), params)
+        return self._conn.execute(query, params)
+
+    def cursor(self):
+        return self._conn.cursor()
+
+    def commit(self):
+        return self._conn.commit()
+
+    def close(self):
+        return self._conn.close()
+
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+
+
 def execute(c, query, params=()):
-    if is_postgres():
-        return c.execute(query.replace("?", "%s"), params)
     return c.execute(query, params)
 
 
@@ -28,7 +48,7 @@ def db():
     if is_postgres():
         conn = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
         conn.cursor_factory = RealDictCursor
-        return conn
+        return ConnectionProxy(conn)
 
     # SQLite connection tuned for Flask so simultaneous requests do not
     # immediately fail with "database is locked".
