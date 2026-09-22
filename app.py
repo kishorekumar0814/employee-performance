@@ -23,9 +23,12 @@ class ConnectionProxy:
         self._conn = conn
 
     def execute(self, query, params=()):
+        cur = self._conn.cursor()
         if is_postgres():
-            return self._conn.cursor().execute(query.replace("?", "%s"), params)
-        return self._conn.execute(query, params)
+            cur.execute(query.replace("?", "%s"), params)
+            return cur
+        cur.execute(query, params)
+        return cur
 
     def cursor(self):
         return self._conn.cursor()
@@ -62,12 +65,13 @@ def db():
 
 def ensure_column(c, table, column, definition):
     if is_postgres():
-        exists = execute(c, """SELECT EXISTS (
+        cur = c.execute("""SELECT EXISTS (
             SELECT 1 FROM information_schema.columns
-            WHERE table_name = ? AND column_name = ?
-        )""", (table, column)).fetchone()[0]
+            WHERE table_name = %s AND column_name = %s
+        )""", (table, column))
+        exists = cur.fetchone()[0]
         if not exists:
-            execute(c, f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+            c.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
         return
 
     cols = [r["name"] for r in c.execute(f"PRAGMA table_info({table})").fetchall()]
