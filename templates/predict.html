@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block content %}<section class="formbox"><h1>Predict Performance</h1><p><b>{{employee.name}}</b> · {{employee.employee_id}}</p>
+<form method="post" class="grid">
+<label>Attendance Rate<input type="number" step=".01" name="attendance_rate" required></label>
+<label>Training Hours<input type="number" step=".01" name="training_hours" required></label>
+<label>Overtime Hours<input type="number" step=".01" name="overtime_hours" required></label>
+<label>Projects Completed<input type="number" step=".01" name="projects_completed" required></label>
+<label>Satisfaction Score<input type="number" step=".01" name="satisfaction_score" required></label>
+<label>Work-Life Balance<input type="number" step=".01" name="work_life_balance" required></label>
+<label>Salary<input type="number" step=".01" name="salary" required></label>
+<div class="info">Experience per Age, Attendance × Training and Salary per Experience are calculated automatically.</div>
+<div><button>Predict Performance & Save</button><a class="small gray" href="{{url_for('hr_dashboard')}}">Back</a></div></form></section>{% endblock %}

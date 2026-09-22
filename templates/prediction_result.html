@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% block content %}<section class="result"><h1>Prediction Completed ✓</h1><p>{{employee.name}} ({{employee.employee_id}})</p><div class="prediction">{{prediction}}</div><p>Prediction saved to history successfully.</p>
+<a class="button" href="{{url_for('history',employee_id=employee.employee_id)}}">View History</a><a class="small gray" href="{{url_for('hr_dashboard')}}">Dashboard</a></section>{% endblock %}
