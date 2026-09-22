@@ -69,7 +69,8 @@ def ensure_column(c, table, column, definition):
             SELECT 1 FROM information_schema.columns
             WHERE table_name = %s AND column_name = %s
         )""", (table, column))
-        exists = cur.fetchone()[0]
+        row = cur.fetchone()
+        exists = row[0] if isinstance(row, tuple) else row.get("exists", False)
         if not exists:
             c.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
         return
